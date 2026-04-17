@@ -2,13 +2,14 @@ import tqdm
 
 
 def train(model, train_loader, iters, loss_cbs=list(), eval_cbs=list()):
-    '''Train a model with a "train_a_batch" method for [iters] iterations on data from [train_loader].
+    """Train a model with a "train_a_batch" method for [iters] iterations on data from [train_loader].
 
     [model]             model to optimize
     [train_loader]      <dataloader> for training [model] on
     [iters]             <int> (max) number of iterations (i.e., batches) to train for
     [loss_cbs]          <list> of callback-<functions> to keep track of training progress
-    [eval_cbs]          <list> of callback-<functions> to evaluate model on separate data-set'''
+    [eval_cbs]          <list> of callback-<functions> to evaluate model on separate data-set
+    """
 
     device = model._device()
 

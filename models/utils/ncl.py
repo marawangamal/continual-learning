@@ -1,5 +1,7 @@
 """NCL utility functions"""
+
 import torch
+
 
 def additive_nearest_kf(B, C):
     """Here it is assumed that all these matrices are symmetric, which is NOT CHECKED explicitly"""
@@ -19,6 +21,8 @@ def additive_nearest_kf(B, C):
         print("zero trace!")
         return BR, BL
 
-    pi = torch.sqrt(torch.trace(BL) * torch.trace(CR)) / torch.sqrt(torch.trace(CL) * torch.trace(BR))
+    pi = torch.sqrt(torch.trace(BL) * torch.trace(CR)) / torch.sqrt(
+        torch.trace(CL) * torch.trace(BR)
+    )
 
     return BR + CR / pi, BL + CL * pi

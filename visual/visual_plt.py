@@ -1,5 +1,6 @@
 import matplotlib
-matplotlib.use('Agg')
+
+matplotlib.use("Agg")
 # above 2 lines set the matplotlib backend to 'Agg', which
 #  enables matplotlib-plots to also be generated if no X-server
 #  is defined (e.g., when running in basic Docker-container)
@@ -14,21 +15,35 @@ def open_pdf(full_path):
 
 
 def plot_images_from_tensor(image_tensor, pdf=None, nrow=8, title=None):
-    '''Plot images in [image_tensor] as a grid with [nrow] into [pdf].
+    """Plot images in [image_tensor] as a grid with [nrow] into [pdf].
 
-    [image_tensor]      <tensor> [batch_size]x[channels]x[width]x[height]'''
+    [image_tensor]      <tensor> [batch_size]x[channels]x[width]x[height]"""
 
-    image_grid = make_grid(image_tensor, nrow=nrow, pad_value=1)  # pad_value=0 would give black borders
-    plt.imshow(np.transpose(image_grid.numpy(), (1,2,0)))
+    image_grid = make_grid(
+        image_tensor, nrow=nrow, pad_value=1
+    )  # pad_value=0 would give black borders
+    plt.imshow(np.transpose(image_grid.numpy(), (1, 2, 0)))
     if title:
         plt.title(title)
     if pdf is not None:
         pdf.savefig()
 
 
-def plot_scatter_groups(x, y, colors=None, ylabel=None, xlabel=None, title=None, top_title=None, names=None,
-                        xlim=None, ylim=None, markers=None, figsize=None):
-    '''Generate a figure containing a scatter-plot.'''
+def plot_scatter_groups(
+    x,
+    y,
+    colors=None,
+    ylabel=None,
+    xlabel=None,
+    title=None,
+    top_title=None,
+    names=None,
+    xlim=None,
+    ylim=None,
+    markers=None,
+    figsize=None,
+):
+    """Generate a figure containing a scatter-plot."""
 
     # if needed, generate default group-names
     if names == None:
@@ -37,13 +52,25 @@ def plot_scatter_groups(x, y, colors=None, ylabel=None, xlabel=None, title=None,
 
     # make plot
     f, axarr = plt.subplots(1, 1, figsize=(12, 7) if figsize is None else figsize)
-    for i,name in enumerate(names):
+    for i, name in enumerate(names):
         # plot individual points
-        axarr.scatter(x=x[i], y=y[i], color=None if (colors is None) else colors[i],
-                      marker="o" if markers is None else markers[i], s=40, alpha=0.5)
+        axarr.scatter(
+            x=x[i],
+            y=y[i],
+            color=None if (colors is None) else colors[i],
+            marker="o" if markers is None else markers[i],
+            s=40,
+            alpha=0.5,
+        )
         # plot group means
-        axarr.scatter(x=np.mean(x[i]), y=np.mean(y[i]), color=None if (colors is None) else colors[i], label=name,
-                      marker="*" if markers is None else markers[i], s=160)
+        axarr.scatter(
+            x=np.mean(x[i]),
+            y=np.mean(y[i]),
+            color=None if (colors is None) else colors[i],
+            label=name,
+            marker="*" if markers is None else markers[i],
+            s=160,
+        )
 
     # finish layout
     # -set y/x-axis
@@ -69,15 +96,24 @@ def plot_scatter_groups(x, y, colors=None, ylabel=None, xlabel=None, title=None,
     return f
 
 
-def plot_bar(numbers, names=None, colors=None, ylabel=None, title=None, top_title=None, ylim=None, figsize=None,
-             yerr=None):
-    '''Generate a figure containing a bar-graph.'''
+def plot_bar(
+    numbers,
+    names=None,
+    colors=None,
+    ylabel=None,
+    title=None,
+    top_title=None,
+    ylim=None,
+    figsize=None,
+    yerr=None,
+):
+    """Generate a figure containing a bar-graph."""
 
     # number of bars
     n_bars = len(numbers)
 
     # make plot
-    size = (12,7) if figsize is None else figsize
+    size = (12, 7) if figsize is None else figsize
     f, axarr = plt.subplots(1, 1, figsize=size)
     axarr.bar(x=range(n_bars), height=numbers, color=colors, yerr=yerr)
 
@@ -100,12 +136,33 @@ def plot_bar(numbers, names=None, colors=None, ylabel=None, title=None, top_titl
     return f
 
 
-def plot_lines(list_with_lines, x_axes=None, line_names=None, colors=None, title=None,
-               title_top=None, xlabel=None, ylabel=None, ylim=None, figsize=None, list_with_errors=None, errors="shaded",
-               x_log=False, with_dots=False, linestyle='solid', h_line=None, h_label=None, h_error=None,
-               h_lines=None, h_colors=None, h_labels=None, h_errors=None,
-               v_line=None, v_label=None):
-    '''Generates a figure containing multiple lines in one plot.
+def plot_lines(
+    list_with_lines,
+    x_axes=None,
+    line_names=None,
+    colors=None,
+    title=None,
+    title_top=None,
+    xlabel=None,
+    ylabel=None,
+    ylim=None,
+    figsize=None,
+    list_with_errors=None,
+    errors="shaded",
+    x_log=False,
+    with_dots=False,
+    linestyle="solid",
+    h_line=None,
+    h_label=None,
+    h_error=None,
+    h_lines=None,
+    h_colors=None,
+    h_labels=None,
+    h_errors=None,
+    v_line=None,
+    v_label=None,
+):
+    """Generates a figure containing multiple lines in one plot.
 
     :param list_with_lines: <list> of all lines to plot (with each line being a <list> as well)
     :param x_axes:          <list> containing the values for the x-axis
@@ -114,7 +171,7 @@ def plot_lines(list_with_lines, x_axes=None, line_names=None, colors=None, title
     :param title:           <str> title of plot
     :param title_top:       <str> text to appear on top of the title
     :return: f:             <figure>
-    '''
+    """
 
     # if needed, generate default x-axis
     if x_axes == None:
@@ -127,67 +184,139 @@ def plot_lines(list_with_lines, x_axes=None, line_names=None, colors=None, title
         line_names = ["line " + str(line_id) for line_id in range(n_lines)]
 
     # make plot
-    size = (12,7) if figsize is None else figsize
+    size = (12, 7) if figsize is None else figsize
     f, axarr = plt.subplots(1, 1, figsize=size)
 
     # add error-lines / shaded areas
     if list_with_errors is not None:
         for line_id, name in enumerate(line_names):
-            if errors=="shaded":
-                axarr.fill_between(x_axes, list(np.array(list_with_lines[line_id]) + np.array(list_with_errors[line_id])),
-                                   list(np.array(list_with_lines[line_id]) - np.array(list_with_errors[line_id])),
-                                   color=None if (colors is None) else colors[line_id], alpha=0.25)
+            if errors == "shaded":
+                axarr.fill_between(
+                    x_axes,
+                    list(
+                        np.array(list_with_lines[line_id])
+                        + np.array(list_with_errors[line_id])
+                    ),
+                    list(
+                        np.array(list_with_lines[line_id])
+                        - np.array(list_with_errors[line_id])
+                    ),
+                    color=None if (colors is None) else colors[line_id],
+                    alpha=0.25,
+                )
             else:
-                axarr.plot(x_axes, list(np.array(list_with_lines[line_id]) + np.array(list_with_errors[line_id])), label=None,
-                           color=None if (colors is None) else colors[line_id], linewidth=1, linestyle='dashed')
-                axarr.plot(x_axes, list(np.array(list_with_lines[line_id]) - np.array(list_with_errors[line_id])), label=None,
-                           color=None if (colors is None) else colors[line_id], linewidth=1, linestyle='dashed')
+                axarr.plot(
+                    x_axes,
+                    list(
+                        np.array(list_with_lines[line_id])
+                        + np.array(list_with_errors[line_id])
+                    ),
+                    label=None,
+                    color=None if (colors is None) else colors[line_id],
+                    linewidth=1,
+                    linestyle="dashed",
+                )
+                axarr.plot(
+                    x_axes,
+                    list(
+                        np.array(list_with_lines[line_id])
+                        - np.array(list_with_errors[line_id])
+                    ),
+                    label=None,
+                    color=None if (colors is None) else colors[line_id],
+                    linewidth=1,
+                    linestyle="dashed",
+                )
 
     # mean lines
     for line_id, name in enumerate(line_names):
-        axarr.plot(x_axes, list_with_lines[line_id], label=name,
-                   color=None if (colors is None) else colors[line_id],
-                   linewidth=4, marker='o' if with_dots else None, linestyle=linestyle if type(linestyle)==str else linestyle[line_id])
+        axarr.plot(
+            x_axes,
+            list_with_lines[line_id],
+            label=name,
+            color=None if (colors is None) else colors[line_id],
+            linewidth=4,
+            marker="o" if with_dots else None,
+            linestyle=linestyle if type(linestyle) == str else linestyle[line_id],
+        )
 
     # add horizontal line
     if h_line is not None:
         axarr.axhline(y=h_line, label=h_label, color="grey")
         if h_error is not None:
             if errors == "shaded":
-                axarr.fill_between([x_axes[0], x_axes[-1]],
-                                   [h_line + h_error, h_line + h_error], [h_line - h_error, h_line - h_error],
-                                   color="grey", alpha=0.25)
+                axarr.fill_between(
+                    [x_axes[0], x_axes[-1]],
+                    [h_line + h_error, h_line + h_error],
+                    [h_line - h_error, h_line - h_error],
+                    color="grey",
+                    alpha=0.25,
+                )
             else:
-                axarr.axhline(y=h_line + h_error, label=None, color="grey", linewidth=1, linestyle='dashed')
-                axarr.axhline(y=h_line - h_error, label=None, color="grey", linewidth=1, linestyle='dashed')
+                axarr.axhline(
+                    y=h_line + h_error,
+                    label=None,
+                    color="grey",
+                    linewidth=1,
+                    linestyle="dashed",
+                )
+                axarr.axhline(
+                    y=h_line - h_error,
+                    label=None,
+                    color="grey",
+                    linewidth=1,
+                    linestyle="dashed",
+                )
 
     # add horizontal lines
     if h_lines is not None:
         h_colors = colors if h_colors is None else h_colors
         for line_id, new_h_line in enumerate(h_lines):
-            axarr.axhline(y=new_h_line, label=None if h_labels is None else h_labels[line_id],
-                          color=None if (h_colors is None) else h_colors[line_id])
+            axarr.axhline(
+                y=new_h_line,
+                label=None if h_labels is None else h_labels[line_id],
+                color=None if (h_colors is None) else h_colors[line_id],
+            )
             if h_errors is not None:
                 if errors == "shaded":
-                    axarr.fill_between([x_axes[0], x_axes[-1]],
-                                       [new_h_line + h_errors[line_id], new_h_line+h_errors[line_id]],
-                                       [new_h_line - h_errors[line_id], new_h_line - h_errors[line_id]],
-                                       color=None if (h_colors is None) else h_colors[line_id], alpha=0.25)
+                    axarr.fill_between(
+                        [x_axes[0], x_axes[-1]],
+                        [
+                            new_h_line + h_errors[line_id],
+                            new_h_line + h_errors[line_id],
+                        ],
+                        [
+                            new_h_line - h_errors[line_id],
+                            new_h_line - h_errors[line_id],
+                        ],
+                        color=None if (h_colors is None) else h_colors[line_id],
+                        alpha=0.25,
+                    )
                 else:
-                    axarr.axhline(y=new_h_line+h_errors[line_id], label=None,
-                                  color=None if (h_colors is None) else h_colors[line_id], linewidth=1,
-                                  linestyle='dashed')
-                    axarr.axhline(y=new_h_line-h_errors[line_id], label=None,
-                                  color=None if (h_colors is None) else h_colors[line_id], linewidth=1,
-                                  linestyle='dashed')
-                    
+                    axarr.axhline(
+                        y=new_h_line + h_errors[line_id],
+                        label=None,
+                        color=None if (h_colors is None) else h_colors[line_id],
+                        linewidth=1,
+                        linestyle="dashed",
+                    )
+                    axarr.axhline(
+                        y=new_h_line - h_errors[line_id],
+                        label=None,
+                        color=None if (h_colors is None) else h_colors[line_id],
+                        linewidth=1,
+                        linestyle="dashed",
+                    )
+
     # add vertical line(s)
     if v_line is not None:
-        if type(v_line)==list:
-            for id,new_line in enumerate(v_line):
-                axarr.axvline(x=new_line, label=v_label if id==0 else None, color='black')
+        if type(v_line) == list:
+            for id, new_line in enumerate(v_line):
+                axarr.axvline(
+                    x=new_line, label=v_label if id == 0 else None, color="black"
+                )
         else:
-            axarr.axvline(x=v_line, label=v_label, color='black')
+            axarr.axvline(x=v_line, label=v_label, color="black")
 
     # finish layout
     # -set y-axis
@@ -208,21 +337,34 @@ def plot_lines(list_with_lines, x_axes=None, line_names=None, colors=None, title
         axarr.legend()
     # -set x-axis to log-scale
     if x_log:
-        axarr.set_xscale('log')
+        axarr.set_xscale("log")
 
     # return the figure
     return f
 
 
-
-
-
 def plot_lines_with_baselines(
-        list_with_lines, x_axes=None, line_names=None, colors=None, title=None, title_top=None, xlabel=None,
-        ylabel=None, ylim=None, figsize=None, list_with_errors=None, errors="shaded", x_log=False, with_dots=False,
-        linestyle='solid', h_lines=None, h_colors=None, h_labels=None, h_errors=None
+    list_with_lines,
+    x_axes=None,
+    line_names=None,
+    colors=None,
+    title=None,
+    title_top=None,
+    xlabel=None,
+    ylabel=None,
+    ylim=None,
+    figsize=None,
+    list_with_errors=None,
+    errors="shaded",
+    x_log=False,
+    with_dots=False,
+    linestyle="solid",
+    h_lines=None,
+    h_colors=None,
+    h_labels=None,
+    h_errors=None,
 ):
-    '''Generates a figure containing multiple lines, with a sideplot depicting the baselines (i.e., [h_lines]).
+    """Generates a figure containing multiple lines, with a sideplot depicting the baselines (i.e., [h_lines]).
 
     :param list_with_lines: <list> of all lines to plot (with each line being a <list> as well)
     :param x_axes:          <list> containing the values for the x-axis
@@ -231,7 +373,7 @@ def plot_lines_with_baselines(
     :param title:           <str> title of plot
     :param title_top:       <str> text to appear on top of the title
     :return: f:             <figure>
-    '''
+    """
 
     # if needed, generate default x-axis
     if x_axes == None:
@@ -245,52 +387,111 @@ def plot_lines_with_baselines(
 
     # make plot
     size = (12, 7) if figsize is None else figsize
-    f, (ax0, ax1) = plt.subplots(1, 2, gridspec_kw={'width_ratios': [1, 3]}, figsize=size)
+    f, (ax0, ax1) = plt.subplots(
+        1, 2, gridspec_kw={"width_ratios": [1, 3]}, figsize=size
+    )
 
     # add error-lines / shaded areas
     if list_with_errors is not None:
         for line_id, name in enumerate(line_names):
             if errors == "shaded":
-                ax1.fill_between(x_axes, list(np.array(list_with_lines[line_id]) + np.array(list_with_errors[line_id])),
-                                 list(np.array(list_with_lines[line_id]) - np.array(list_with_errors[line_id])),
-                                 color=None if (colors is None) else colors[line_id], alpha=0.25)
+                ax1.fill_between(
+                    x_axes,
+                    list(
+                        np.array(list_with_lines[line_id])
+                        + np.array(list_with_errors[line_id])
+                    ),
+                    list(
+                        np.array(list_with_lines[line_id])
+                        - np.array(list_with_errors[line_id])
+                    ),
+                    color=None if (colors is None) else colors[line_id],
+                    alpha=0.25,
+                )
             else:
-                ax1.plot(x_axes, list(np.array(list_with_lines[line_id]) + np.array(list_with_errors[line_id])),
-                         label=None,
-                         color=None if (colors is None) else colors[line_id], linewidth=1, linestyle='dashed')
-                ax1.plot(x_axes, list(np.array(list_with_lines[line_id]) - np.array(list_with_errors[line_id])),
-                         label=None,
-                         color=None if (colors is None) else colors[line_id], linewidth=1, linestyle='dashed')
+                ax1.plot(
+                    x_axes,
+                    list(
+                        np.array(list_with_lines[line_id])
+                        + np.array(list_with_errors[line_id])
+                    ),
+                    label=None,
+                    color=None if (colors is None) else colors[line_id],
+                    linewidth=1,
+                    linestyle="dashed",
+                )
+                ax1.plot(
+                    x_axes,
+                    list(
+                        np.array(list_with_lines[line_id])
+                        - np.array(list_with_errors[line_id])
+                    ),
+                    label=None,
+                    color=None if (colors is None) else colors[line_id],
+                    linewidth=1,
+                    linestyle="dashed",
+                )
 
     # mean lines
     for line_id, name in enumerate(line_names):
-        ax1.plot(x_axes, list_with_lines[line_id], label=name,
-                 color=None if (colors is None) else colors[line_id],
-                 linewidth=2, marker='o' if with_dots else None,
-                 linestyle=linestyle if type(linestyle) == str else linestyle[line_id])
+        ax1.plot(
+            x_axes,
+            list_with_lines[line_id],
+            label=name,
+            color=None if (colors is None) else colors[line_id],
+            linewidth=2,
+            marker="o" if with_dots else None,
+            linestyle=linestyle if type(linestyle) == str else linestyle[line_id],
+        )
 
     # add horizontal lines
     if h_lines is not None:
         h_colors = colors if h_colors is None else h_colors
         for line_id, new_h_line in enumerate(h_lines):
-            ax0.plot([line_id - 0.45, line_id + 0.45], [new_h_line, new_h_line],
-                     label=None if h_labels is None else h_labels[line_id],
-                     color=None if (h_colors is None) else h_colors[line_id])
+            ax0.plot(
+                [line_id - 0.45, line_id + 0.45],
+                [new_h_line, new_h_line],
+                label=None if h_labels is None else h_labels[line_id],
+                color=None if (h_colors is None) else h_colors[line_id],
+            )
             if h_errors is not None:
                 if errors == "shaded":
-                    ax0.fill_between([line_id - 0.45, line_id + 0.45],
-                                     [new_h_line + h_errors[line_id], new_h_line + h_errors[line_id]],
-                                     [new_h_line - h_errors[line_id], new_h_line - h_errors[line_id]],
-                                     color=None if (h_colors is None) else h_colors[line_id], alpha=0.25)
+                    ax0.fill_between(
+                        [line_id - 0.45, line_id + 0.45],
+                        [
+                            new_h_line + h_errors[line_id],
+                            new_h_line + h_errors[line_id],
+                        ],
+                        [
+                            new_h_line - h_errors[line_id],
+                            new_h_line - h_errors[line_id],
+                        ],
+                        color=None if (h_colors is None) else h_colors[line_id],
+                        alpha=0.25,
+                    )
                 else:
-                    ax0.plot([line_id - 0.45, line_id + 0.45],
-                             [new_h_line + h_errors[line_id], new_h_line + h_errors[line_id]], label=None,
-                             color=None if (h_colors is None) else h_colors[line_id], linewidth=1,
-                             linestyle='dashed')
-                    ax0.plot([line_id - 0.45, line_id + 0.45],
-                             [new_h_line - h_errors[line_id], new_h_line - h_errors[line_id]], label=None,
-                             color=None if (h_colors is None) else h_colors[line_id], linewidth=1,
-                             linestyle='dashed')
+                    ax0.plot(
+                        [line_id - 0.45, line_id + 0.45],
+                        [
+                            new_h_line + h_errors[line_id],
+                            new_h_line + h_errors[line_id],
+                        ],
+                        label=None,
+                        color=None if (h_colors is None) else h_colors[line_id],
+                        linewidth=1,
+                        linestyle="dashed",
+                    )
+                    ax0.plot(
+                        [line_id - 0.45, line_id + 0.45],
+                        [
+                            new_h_line - h_errors[line_id],
+                            new_h_line - h_errors[line_id],
+                        ],
+                        label=None,
+                        color=None if (h_colors is None) else h_colors[line_id],
+                        linewidth=1,
+                        linestyle="dashed",
+                    )
 
     # ax0.axis('off')
     ax0.set_xticks([])
@@ -322,21 +523,28 @@ def plot_lines_with_baselines(
 
     # -set x-axis to log-scale
     if x_log:
-        ax1.set_xscale('log')
+        ax1.set_xscale("log")
 
     # return the figure
     return f
 
 
-
-
-def plot_bars(number_list, names=None, colors=None, ylabel=None, title_list=None, top_title=None, ylim=None,
-              figsize=None, yerr=None):
-    '''Generate a figure containing multiple bar-graphs.
+def plot_bars(
+    number_list,
+    names=None,
+    colors=None,
+    ylabel=None,
+    title_list=None,
+    top_title=None,
+    ylim=None,
+    figsize=None,
+    yerr=None,
+):
+    """Generate a figure containing multiple bar-graphs.
 
     [number_list]   <list> with <lists> of numbers to plot in each sub-graph
     [names]         <list> (with <lists>) of names for axis
-    [colors]        <list> (with <lists>) of colors'''
+    [colors]        <list> (with <lists>) of colors"""
 
     # number of plots
     n_plots = len(number_list)
@@ -347,16 +555,20 @@ def plot_bars(number_list, names=None, colors=None, ylabel=None, title_list=None
         n_bars.append(len(number_list[i]))
 
     # decide on scale y-axis
-    y_max = np.max(number_list)+0.07*np.max(number_list)
+    y_max = np.max(number_list) + 0.07 * np.max(number_list)
 
     # make figure
-    size = (16,7) if figsize is None else figsize
+    size = (16, 7) if figsize is None else figsize
     f, axarr = plt.subplots(1, n_plots, figsize=size)
 
     # make all plots
     for i in range(n_plots):
-        axarr[i].bar(x=range(n_bars[i]), height=number_list[i], color=colors[i] if type(colors[0])==list else colors,
-                     yerr=yerr[i] if yerr is not None else None)
+        axarr[i].bar(
+            x=range(n_bars[i]),
+            height=number_list[i],
+            color=colors[i] if type(colors[0]) == list else colors,
+            yerr=yerr[i] if yerr is not None else None,
+        )
 
         # finish layout for this plot
         if ylim is None:
@@ -365,9 +577,11 @@ def plot_bars(number_list, names=None, colors=None, ylabel=None, title_list=None
             axarr[i].set_ylim(ylim)
         axarr[i].set_xticks(range(n_bars[i]))
         if names is not None:
-            axarr[i].set_xticklabels(names[i] if type(names[0])==list else names, rotation=-20)
+            axarr[i].set_xticklabels(
+                names[i] if type(names[0]) == list else names, rotation=-20
+            )
             axarr[i].legend()
-        if i==0 and ylabel is not None:
+        if i == 0 and ylabel is not None:
             axarr[i].set_ylabel(ylabel)
         if title_list is not None:
             axarr[i].set_title(title_list[i])
