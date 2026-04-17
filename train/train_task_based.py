@@ -505,6 +505,9 @@ def train_cl(
                 model.weight_penalty or model.precondition
             ):
                 model.update_omega(W, model.epsilon)
+            ##--> actmat-i: snapshot current weights as anchor θ*
+            if model.importance_weighting == "actmat-i" and model.weight_penalty:
+                model.store_actmat_i_anchor()
 
         # MEMORY BUFFER: update the memory buffer
         if checkattr(model, "use_memory_buffer"):

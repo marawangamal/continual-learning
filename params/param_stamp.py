@@ -249,6 +249,8 @@ def get_param_stamp(
             param_reg_stamp += "-SI{}".format(args.epsilon)
         elif args.importance_weighting == "owm":
             param_reg_stamp += "-OWM"
+        elif args.importance_weighting == "actmat-i":
+            param_reg_stamp += "-ActMatI"
 
     # -for context-specific components
     xdg_stamp = ""

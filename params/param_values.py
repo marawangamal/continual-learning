@@ -10,6 +10,9 @@ def set_method_options(args, **kwargs):
     if checkattr(args, "si"):
         args.weight_penalty = True
         args.importance_weighting = "si"
+    if checkattr(args, "actmat_i"):
+        args.weight_penalty = True
+        args.importance_weighting = "actmat-i"
     if checkattr(args, "ncl"):
         args.weight_penalty = True
         args.precondition = True
