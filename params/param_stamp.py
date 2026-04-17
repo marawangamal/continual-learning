@@ -251,6 +251,10 @@ def get_param_stamp(
             param_reg_stamp += "-OWM"
         elif args.importance_weighting == "actmat-i":
             param_reg_stamp += "-ActMatI"
+        elif args.importance_weighting == "actmat-c":
+            param_reg_stamp += "-ActMatC{}".format(
+                "All" if args.actmat_c_n is None else args.actmat_c_n
+            )
 
     # -for context-specific components
     xdg_stamp = ""

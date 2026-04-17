@@ -508,6 +508,10 @@ def train_cl(
             ##--> actmat-i: snapshot current weights as anchor θ*
             if model.importance_weighting == "actmat-i" and model.weight_penalty:
                 model.store_actmat_i_anchor()
+            ##--> actmat-c: snapshot weights + estimate C for each Linear layer
+            if model.importance_weighting == "actmat-c" and model.weight_penalty:
+                model.store_actmat_c_anchor()
+                model.estimate_actmat_c_covariance(training_dataset)
 
         # MEMORY BUFFER: update the memory buffer
         if checkattr(model, "use_memory_buffer"):

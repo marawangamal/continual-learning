@@ -401,6 +401,8 @@ class Classifier(ContinualLearner, MemoryBuffer):
                     weight_penalty_loss = self.ewc_loss()
             elif self.importance_weighting == "actmat-i":
                 weight_penalty_loss = self.actmat_i_loss()
+            elif self.importance_weighting == "actmat-c":
+                weight_penalty_loss = self.actmat_c_loss()
             loss_total += self.reg_strength * weight_penalty_loss
 
         ##--(4)-- COMPUTE (AND MANIPULATE) GRADIENTS --##

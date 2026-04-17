@@ -307,6 +307,11 @@ def run(args, verbose=False):
         model.reg_strength = args.reg_strength
         if model.importance_weighting == "si":
             model.epsilon = args.epsilon if hasattr(args, "epsilon") else 0.1
+        if model.importance_weighting == "actmat-c":
+            model.actmat_c_n = args.actmat_c_n if hasattr(args, "actmat_c_n") else None
+            model.actmat_c_batch = (
+                args.actmat_c_batch if hasattr(args, "actmat_c_batch") else 1
+            )
 
     # Parameter regularization through pre-conditioning of the gradient (e.g., OWM, NCL)
     if isinstance(model, ContinualLearner) and checkattr(args, "precondition"):

@@ -548,6 +548,23 @@ def add_cl_options(
                 action="store_true",
                 help="select defaults for 'actmat-i' (activation matching w/ identity, = L2 anchoring)",
             )
+            param_reg.add_argument(
+                "--actmat-c",
+                action="store_true",
+                help="select defaults for 'actmat-c' (activation matching w/ input covariance)",
+            )
+            param_reg.add_argument(
+                "--actmat-c-n",
+                type=int,
+                help="-> actmat-c: sample size for estimating input covariance C per Linear layer",
+            )
+            param_reg.add_argument(
+                "--actmat-c-batch",
+                type=int,
+                default=1,
+                metavar="N",
+                help="-> actmat-c: batch size for estimating C",
+            )
             # Custom commands for specifying how parameter regularization should be performed
             param_reg.add_argument(
                 "--weight-penalty",

@@ -7,6 +7,7 @@ from torch.nn import functional as F
 from utils import get_data_loader
 from models import fc
 from models.utils.ncl import additive_nearest_kf
+from covariance import register_hooks
 
 
 class ContinualLearner(nn.Module, metaclass=abc.ABCMeta):
@@ -226,6 +227,82 @@ class ContinualLearner(nn.Module, metaclass=abc.ABCMeta):
                         anchor = getattr(self, "{}_ACTMAT_I_anchor".format(n))
                         losses.append(((p - anchor) ** 2).sum())
             return 0.5 * sum(losses)
+        except AttributeError:
+            return torch.tensor(0.0, device=self._device())
+
+    # ----------------- "actmat-c" (activation matching w/ input covariance) functions -----------------#
+
+    def store_actmat_c_anchor(self):
+        """Snapshot current weights as anchor θ*. Called at end of each context."""
+        for gen_params in self.param_list:
+            for n, p in gen_params():
+                if p.requires_grad:
+                    n = n.replace(".", "__")
+                    self.register_buffer(
+                        "{}_ACTMAT_C_anchor".format(n), p.detach().clone()
+                    )
+
+    def estimate_actmat_c_covariance(self, dataset):
+        """Estimate per-Linear-layer input covariance C = E[x xᵀ] on [dataset].
+
+        Uses covariance.register_hooks; maps each Linear module's name back to
+        its `.weight` parameter-name so the C buffer aligns with the anchor.
+        """
+        cobjs, handles = register_hooks(
+            self, cov_device=self._device(), cov_type="sm"
+        )
+        mode = self.training
+        self.eval()
+        data_loader = get_data_loader(
+            dataset, batch_size=self.actmat_c_batch, cuda=self._is_on_cuda()
+        )
+        total = 0
+        budget = self.actmat_c_n
+        with torch.no_grad():
+            for x, _ in data_loader:
+                x = x.to(self._device())
+                _ = self(x)
+                total += x.shape[0]
+                if budget is not None and total >= budget:
+                    break
+        for h in handles:
+            h.remove()
+        self.train(mode=mode)
+        mod_to_weight_name = {
+            mod_name: "{}.weight".format(mod_name)
+            for mod_name, module in self.named_modules()
+            if isinstance(module, nn.Linear)
+        }
+        for mod_name, cobj in cobjs.items():
+            if cobj.n == 0:
+                continue
+            weight_param = mod_to_weight_name.get(mod_name)
+            if weight_param is None:
+                continue
+            n_safe = weight_param.replace(".", "__")
+            self.register_buffer(
+                "{}_ACTMAT_C_cov".format(n_safe), cobj.cov.detach()
+            )
+
+    def actmat_c_loss(self):
+        """Σ Tr[(W-W*) C (W-W*)ᵀ] over linear weights, + 0.5·Σ(θ-θ*)² over the rest."""
+        try:
+            losses = []
+            for gen_params in self.param_list:
+                for n, p in gen_params():
+                    if not p.requires_grad:
+                        continue
+                    n_safe = n.replace(".", "__")
+                    anchor = getattr(self, "{}_ACTMAT_C_anchor".format(n_safe))
+                    delta = p - anchor
+                    cov = getattr(self, "{}_ACTMAT_C_cov".format(n_safe), None)
+                    if cov is not None and delta.dim() == 2:
+                        losses.append(
+                            torch.einsum("oi,ij,oj->", delta, cov, delta)
+                        )
+                    else:
+                        losses.append(0.5 * (delta ** 2).sum())
+            return sum(losses)
         except AttributeError:
             return torch.tensor(0.0, device=self._device())
 
