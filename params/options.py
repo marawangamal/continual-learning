@@ -543,6 +543,11 @@ def add_cl_options(
                 action="store_true",
                 help="select defaults for 'OWM' (Zeng et al. 2019)",
             )
+            param_reg.add_argument(
+                "--actmat-i",
+                action="store_true",
+                help="select defaults for 'actmat-i' (activation matching w/ identity, = L2 anchoring)",
+            )
             # Custom commands for specifying how parameter regularization should be performed
             param_reg.add_argument(
                 "--weight-penalty",

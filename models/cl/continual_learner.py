@@ -203,6 +203,32 @@ class ContinualLearner(nn.Module, metaclass=abc.ABCMeta):
             # SI-loss is 0 if there is no stored omega yet
             return torch.tensor(0.0, device=self._device())
 
+    # ----------------- "actmat-i" (activation matching w/ identity) functions -----------------#
+
+    def store_actmat_i_anchor(self):
+        """Snapshot current weights as anchor θ*. Called at end of each context."""
+        for gen_params in self.param_list:
+            for n, p in gen_params():
+                if p.requires_grad:
+                    n = n.replace(".", "__")
+                    self.register_buffer(
+                        "{}_ACTMAT_I_anchor".format(n), p.detach().clone()
+                    )
+
+    def actmat_i_loss(self):
+        """0.5 * sum((p - anchor)**2) over regularized params; 0 before first anchor."""
+        try:
+            losses = []
+            for gen_params in self.param_list:
+                for n, p in gen_params():
+                    if p.requires_grad:
+                        n = n.replace(".", "__")
+                        anchor = getattr(self, "{}_ACTMAT_I_anchor".format(n))
+                        losses.append(((p - anchor) ** 2).sum())
+            return 0.5 * sum(losses)
+        except AttributeError:
+            return torch.tensor(0.0, device=self._device())
+
     # ----------------- EWC-specifc functions -----------------#
 
     def initialize_fisher(self):
