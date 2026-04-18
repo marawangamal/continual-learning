@@ -38,7 +38,8 @@ lamda_list_permMNIST = [
     1000000.0,
     10000000.0,
 ]
-lamda_list_actmat_i = [0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0]
+lamda_list_actmat_i = [0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0, 1e2, 1e3, 1e4, 1e5]
+lamda_list_actmat_c = [0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0, 1e2, 1e3, 1e4, 1e5]
 c_list = [
     0.001,
     0.005,
@@ -106,6 +107,7 @@ def handle_inputs():
     parser.add_argument("--no-xdg", action="store_true", help="no XdG")
     parser.add_argument("--no-reg", action="store_true", help="no EWC or SI")
     parser.add_argument("--no-actmat-i", action="store_true", help="no actmat-i")
+    parser.add_argument("--no-actmat-c", action="store_true", help="no actmat-c")
     parser.add_argument("--no-fromp", action="store_true", help="no FROMP")
     parser.add_argument("--no-bir", action="store_true", help="no BI-R")
     # Parse, process (i.e., set defaults for unselected options) and check chosen options
@@ -215,6 +217,16 @@ if __name__ == "__main__":
             ACTMAT_I[lam] = get_result(args)
         args.weight_penalty = False
 
+    ## actmat-c (activation matching with input covariance)
+    if not utils.checkattr(args, "no_actmat_c"):
+        ACTMAT_C = {}
+        args.weight_penalty = True
+        args.importance_weighting = "actmat-c"
+        for lam in lamda_list_actmat_c:
+            args.reg_strength = lam
+            ACTMAT_C[lam] = get_result(args)
+        args.weight_penalty = False
+
     ## FROMP
     if not utils.checkattr(args, "no_fromp"):
         FROMP = {}
@@ -315,6 +327,23 @@ if __name__ == "__main__":
             )
         )
 
+    ###---actmat-c---###
+
+    if not utils.checkattr(args, "no_actmat_c"):
+        # -collect data
+        ave_acc_actmat_c = [BASE] + [ACTMAT_C[lam] for lam in lamda_list_actmat_c]
+        ext_lamda_list_actmat_c = [0] + lamda_list_actmat_c
+        # -print on screen
+        print("\n\nACTIVATION MATCHING w/ COVARIANCE (actmat-c)")
+        print(" param-list (lambda): {}".format(ext_lamda_list_actmat_c))
+        print("  {}".format(ave_acc_actmat_c))
+        print(
+            "--->  lambda = {}     --    {}".format(
+                ext_lamda_list_actmat_c[np.argmax(ave_acc_actmat_c)],
+                np.max(ave_acc_actmat_c),
+            )
+        )
+
     ###---FROMP---###
 
     if not utils.checkattr(args, "no_fromp"):
@@ -372,6 +401,8 @@ if __name__ == "__main__":
         full_list += ave_acc_ewc + ave_acc_si
     if not utils.checkattr(args, "no_actmat_i"):
         full_list += ave_acc_actmat_i
+    if not utils.checkattr(args, "no_actmat_c"):
+        full_list += ave_acc_actmat_c
     if not utils.checkattr(args, "no_fromp"):
         for item in ave_acc_fromp_per_budget:
             full_list += item
@@ -457,6 +488,24 @@ if __name__ == "__main__":
             title=title,
             x_log=True,
             xlabel="actmat-i: lambda (log-scale)",
+            with_dots=True,
+            ylim=ylim,
+            h_line=BASE,
+            h_label="None",
+        )
+        figure_list.append(figure)
+
+    ###---actmat-c---###
+    if not utils.checkattr(args, "no_actmat_c"):
+        figure = my_plt.plot_lines(
+            [ave_acc_actmat_c[1:]],
+            x_axes=lamda_list_actmat_c,
+            ylabel=ylabel,
+            line_names=["actmat-c"],
+            colors=["purple"],
+            title=title,
+            x_log=True,
+            xlabel="actmat-c: lambda (log-scale)",
             with_dots=True,
             ylim=ylim,
             h_line=BASE,
